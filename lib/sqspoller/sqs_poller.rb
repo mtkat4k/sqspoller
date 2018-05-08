@@ -89,16 +89,13 @@ module Sqspoller
       end
 
       def initialize_worker(worker_configuration, total_poller_threads, logger_file)
-        worker_thread_count = worker_configuration[:concurrency]
-        worker_task = worker_configuration[:worker_class].split('::').inject(Object) {|o,c| o.const_get c}.new(worker_configuration, logger_file)
-        waiting_tasks_ratio = worker_configuration[:waiting_tasks_ratio]
-        waiting_tasks_ratio = 1 if waiting_tasks_ratio.nil?
-        if worker_thread_count.nil?
-          message_delegator = MessageDelegator.new total_poller_threads, waiting_tasks_ratio, worker_task, logger_file
-        else
-          message_delegator = MessageDelegator.new worker_thread_count, waiting_tasks_ratio, worker_task, logger_file
-        end
-        return message_delegator
+        worker_thread_count = worker_configuration[:concurrency] || total_poller_threads
+        waiting_tasks_ratio = worker_configuration[:waiting_tasks_ratio] || 1
+
+        klass = worker_configuration[:worker_class].split('::').inject(Object) {|o,c| o.const_get c}
+        worker_task = klass.new(worker_configuration, logger_file)
+
+        MessageDelegator.new worker_thread_count, waiting_tasks_ratio, worker_task, logger_file
       end
     end
   end
