@@ -46,12 +46,11 @@ module Sqspoller
         puts "Started poller method"
         @logger = Logger.new(logger_file)
 
-        total_poller_threads = 0
         qcs = []
         queues_config = config[queue_config_name] || config[queue_config_name.to_sym]
-        queues_config.keys.each { |queue|
-          total_poller_threads += queues_config[queue][:polling_threads]
-        }
+        total_poller_threads = queues_config.keys.reduce(0) do |sum, queue|
+                                 sum += queues_config[queue][:polling_threads]
+                               end
         message_delegator = initialize_worker config[:worker_configuration], total_poller_threads, logger_file
         queues_config.keys.each { |queue|
           if queues_config[queue][:polling_threads] == 0
