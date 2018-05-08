@@ -1,12 +1,7 @@
-require "logger"
 require "concurrent"
-require "net/http"
 require "rest-client"
-require "json"
 
 module Sqspoller
-
-
   class WorkerTask
 
     HEADERS = {
