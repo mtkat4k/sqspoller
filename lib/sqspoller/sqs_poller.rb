@@ -73,9 +73,15 @@ module Sqspoller
       end
 
       def start_poller(filename, queue_config_name, access_key_id, secret_access_key, region, log_filename=nil)
+        content = IO.read filename
+        start_poller_from_content content, queue_config_name, access_key_id, secret_access_key, region, log_filename
+      end
+
+      def start_poller_from_content(content, queue_config_name, access_key_id, secret_access_key, region, log_filename)
         puts "Starting poller"
-        config = YAML.load(ERB.new(IO.read(filename)).result)
-        config = sym(config)
+        erb = ERB.new content
+        config = YAML.load erb.result
+        config = symbolize config
 
         if log_filename.nil? || log_filename.empty?
           puts "Did not receive log file name"
