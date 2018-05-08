@@ -55,18 +55,21 @@ module Sqspoller
         queues_config.keys.each do |queue|
           if queues_config[queue][:polling_threads] == 0
             @logger.info "Polling disabled for queue: #{queue}"
-            next
+          else
+            @logger.info "Creating QueueController object for queue: #{queue}"
+            qc = QueueController.new queue,
+                                     queues_config[queue][:polling_threads],
+                                     message_delegator,
+                                     access_key_id,
+                                     secret_access_key,
+                                     region,
+                                     logger_file
+            qc.start
+            qc.threads.each do |thread|
+              thread.join
+            end
           end
-          @logger.info "Creating QueueController object for queue: #{queue}"
-          qc = QueueController.new queue, queues_config[queue][:polling_threads], message_delegator, access_key_id, secret_access_key, region, logger_file
-          qcs << qc
         end
-
-        qcs.each { |qc|
-          qc.start
-        }
-
-        qcs.each{ |qc| qc.threads.each { |thread| thread.join } }
       end
 
       def start_poller(filename, queue_config_name, access_key_id, secret_access_key, region, log_filename=nil)
