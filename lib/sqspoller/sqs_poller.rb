@@ -12,11 +12,15 @@ module Sqspoller
   class SqsPoller
     class << self
 
-      def sym(map)
+      def symbolize(map)
         if map.class == Hash
-          map = map.inject({}){|memo,(k,v)| memo[k.to_sym] = sym(v); memo}
+          map.inject({}) do |memo,(k,v)|
+            memo[k.to_sym] = symbolize(v)
+            memo
+          end
+        else
+          map
         end
-        return map
       end
 
       def daemonize(filename)
