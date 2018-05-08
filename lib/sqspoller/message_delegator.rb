@@ -12,11 +12,9 @@ module Sqspoller
       @semaphore = Mutex.new
       @worker_task = worker_task
       @pending_schedule_tasks = 0
-      initialize_connection_pool
-    end
-
-    def initialize_connection_pool
-      @connection_pool = Concurrent::RubyThreadPoolExecutor.new(max_threads: @worker_thread_pool_size, min_threads: 1, max_queue: @max_allowed_queue_size)
+      @connection_pool = Concurrent::RubyThreadPoolExecutor.new max_threads: @worker_thread_pool_size,
+                                                                min_threads: 1,
+                                                                max_queue: @max_allowed_queue_size
     end
 
     def process(queue_controller, message, queue_name)
