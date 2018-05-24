@@ -12,15 +12,13 @@ module Sqspoller
       @semaphore = Mutex.new
       @worker_task = worker_task
       @pending_schedule_tasks = 0
-      initialize_connection_pool
-    end
-
-    def initialize_connection_pool
-      @connection_pool = Concurrent::RubyThreadPoolExecutor.new(max_threads: @worker_thread_pool_size, min_threads: 1, max_queue: @max_allowed_queue_size)
+      @connection_pool = Concurrent::RubyThreadPoolExecutor.new max_threads: @worker_thread_pool_size,
+                                                                min_threads: 1,
+                                                                max_queue: @max_allowed_queue_size
     end
 
     def process(queue_controller, message, queue_name)
-      @semaphore.synchronize {
+      @semaphore.synchronize do
         @pending_schedule_tasks +=1
         if @pending_schedule_tasks >= @max_allowed_queue_size
           @logger.info "Entered wait state, connection_pool size reached max threshold, pending_schedule_tasks=#{@pending_schedule_tasks}"
@@ -29,7 +27,7 @@ module Sqspoller
           end
           @logger.info "Exiting wait state, connection_pool size reached below worker_thread_pool_size, pending_schedule_tasks=#{@pending_schedule_tasks}"
         end
-      }
+      end
       @logger.info "Scheduling worker task for message: #{message.message_id}"
 
       begin
