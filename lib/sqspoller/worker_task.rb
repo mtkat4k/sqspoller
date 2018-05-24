@@ -4,14 +4,11 @@ require "rest-client"
 module Sqspoller
   class WorkerTask
 
-    HEADERS = { 'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-              }
     ALLOWED_METHODS = { 'post' => :post,
                         'get'  => :get
                       }
 
-    def initialize(worker_configuration, logger_file)
+    def initialize worker_configuration
       @http_method = ALLOWED_METHODS[worker_configuration[:http_method].downcase]
       @http_url = worker_configuration[:http_url]
       @timeout = worker_configuration[:timeout] && worker_configuration[:timeout].to_i || 450
