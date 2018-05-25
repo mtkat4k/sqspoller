@@ -6,6 +6,6 @@ puts "SQSPoller arguments check"
 ARGV.each do |arg|
   puts "arg: #{arg}"
 end
-puts "Starting poller"
-Sqspoller::SqsPoller.start_poller ARGV[0], ARGV[1], ARGV[2], ARGV[3], ARGV[4], ARGV[5]
+puts "poller start"
+Sqspoller::SqsPoller.start_poller ARGV[0], ARGV[1], ARGV[2], ARGV[3], ARGV[4], ARGV[5], ARGV[6]
 puts "poller done"
