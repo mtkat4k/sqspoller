@@ -4,10 +4,10 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'sqspoller/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "fourkites-sqspoller"
-  spec.version       = '0.1.12.27'
-  spec.authors       = ["anshul-fk"]
-  spec.email         = ["anshul@fourkites.com"]
+  spec.name          = "fk-redis-sqspoller"
+  spec.version       = '0.1.2.1'
+  spec.authors       = ["FourKites"]
+  spec.email         = ["developer@fourkites.com"]
 
   spec.summary       = 'Gem to poll messages from SQS queue and process them'
   spec.description   = ''

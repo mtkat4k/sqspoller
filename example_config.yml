@@ -1,0 +1,23 @@
+worker_configuration:
+  worker_class: "Sqspoller::SnsForwarder"
+  concurrency: 4 # => Total Number of service threads - threads occupied by cron jobs - thread for heartbeat => 2*32 - 8 - 1 = 55
+  waiting_tasks_ratio: 2
+  sns_topic_arn: "arn:aws:sns:us-east-1:723008196684:staging-post"
+  refresh_interval_in_seconds: 3600
+staging-queues:
+  staging-outbound-messages_company-name-1:
+    polling_threads: 1
+  staging-outbound-messages_company-name-2:
+    polling_threads: 1
+  staging-outbound-messages_company-name-3:
+    polling_threads: 1
+production-queues:
+  production-outbound-messages_company-name-1:
+    polling_threads: 1
+  production-outbound-messages_company-name-2:
+    polling_threads: 1
+  production-outbound-messages_company-name-3:
+    polling_threads: 1
+dev-queues:
+test-queues:
+uat-queues:
