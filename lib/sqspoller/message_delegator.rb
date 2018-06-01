@@ -28,23 +28,21 @@ module Sqspoller
           @logger.info "Exiting wait state, connection_pool size reached below worker_thread_pool_size, pending_schedule_tasks=#{@pending_schedule_tasks}"
         end
       end
-      @logger.info "Scheduling worker task for message: #{message.message_id}"
 
       begin
         @connection_pool.post do
           begin
-            @logger.info "Starting worker task for message: #{message.message_id}"
+            @logger.info "  Starting worker task for message: #{message.message_id} on queue #{queue_name}"
             @worker_task.process(message.body, message.message_id)
-            @logger.info "Finished worker task for message: #{message.message_id}"
             queue_controller.delete_message message.receipt_handle
           rescue Exception => e
-            @logger.info "Caught error for message: #{message}, error: #{e.message}, #{e.backtrace.join("\n")}"
+            @logger.info "    Caught error for message: #{message}, error: #{e.message}, #{e.backtrace.join("\n")}"
           end
           @pending_schedule_tasks -= 1
         end
       rescue Concurrent::RejectedExecutionError => e
         @pending_schedule_tasks -= 1
-        @logger.info  "Caught Concurrent::RejectedExecutionError for #{e.message}"
+        @logger.info  "  Caught Concurrent::RejectedExecutionError for #{e.message} on queue #{queue_name}"
       end
     end
   end
