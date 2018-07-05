@@ -32,6 +32,10 @@ module Sqspoller
                             end
     end
 
+    def all_threads_alive?
+      thread.all?(&:alive?)
+    end
+
     def start
       queue_url = @queue_details.queue_url
       @logger.info "Going to start polling threads for queue: #{queue_url}"

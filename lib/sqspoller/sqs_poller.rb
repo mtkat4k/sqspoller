@@ -135,7 +135,12 @@ module Sqspoller
           queues_config.keys.each do |queue|
             @logger.info "    Checking queue #{queue}"
             if queues[queue]
-              @logger.info "      Queue: #{queue} not created, already initialized and running"
+              if queues[queue].all_threads_alive?
+                @logger.info "      Queue: #{queue} not created, already initialized and running"
+              else
+                @logger.info "      Queue: #{queue} previously created, however not all threads are running. Restarting."
+                queues[queue] = start_queue_controller queues_config, queue, message_delegator, poller_args
+              end
             else
               queues[queue] = start_queue_controller queues_config, queue, message_delegator, poller_args
             end
