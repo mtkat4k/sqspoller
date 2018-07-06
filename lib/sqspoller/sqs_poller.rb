@@ -130,7 +130,6 @@ module Sqspoller
         @logger.info "Start all queues with refresh"
         queues = {}
         loop do
-          Thread.pass
           queue_names = queues_config.keys
           queues_config.keys.each do |queue|
             @logger.info "    Checking queue #{queue}"

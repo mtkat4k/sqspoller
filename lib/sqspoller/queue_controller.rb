@@ -33,7 +33,7 @@ module Sqspoller
     end
 
     def all_threads_alive?
-      thread.all?(&:alive?)
+      threads.all?(&:alive?)
     end
 
     def start
