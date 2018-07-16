@@ -101,6 +101,7 @@ module Sqspoller
       def start_queues_with_config poller_args
         @logger = Logger.new(poller_args[:log_filename])
         poller_args[:logger] = @logger
+        @logger.info "Starting version: #{VERSION}"
         @logger.info "Get config"
         config = if poller_args[:redis_or_file]
                    load_config_from_redis poller_args[:content_name]
