@@ -46,19 +46,21 @@ module Sqspoller
 
     def start_thread(queue_url)
       Thread.new do
-        poller = Aws::SQS::QueuePoller.new(queue_url)
-        poller.before_request do |stats|
-          block_on_maintenance_window
-        end
-
         loop do
+          block_on_maintenance_window
           @logger.info "  Polling queue #{queue_name} for messages"
-          poller.poll do |received_message|
+          begin
+            msgs = @sqs.receive_message :queue_url => queue_url
+          rescue Exception => e
+            @logger.info "Error receiving messages from queue #{@queue_name}: #{e.message}"
+            next
+          end
+          msgs.messages.each do |received_message|
             begin
-              @task_delegator.process self, received_message, queue_name
+              @logger.info "Received message from #{@queue_name} : #{received_message.message_id}"
+              @task_delegator.process self, received_message, @queue_name
             rescue Exception => e
-              @logger.info "  Encountered error #{e.message} while submitting message to worker from queue #{queue_name}"
-              throw :skip_delete
+              @logger.info "Encountered error #{e.message} while submitting message from queue #{queue_url}"
             end
           end
         end
