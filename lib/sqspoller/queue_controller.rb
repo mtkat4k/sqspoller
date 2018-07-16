@@ -50,7 +50,7 @@ module Sqspoller
           block_on_maintenance_window
           @logger.info "  Polling queue #{queue_name} for messages"
           begin
-            msgs = @sqs.receive_message :queue_url => queue_url
+            msgs = @sqs.receive_message queue_url: queue_url, wait_time_seconds: 20
           rescue Exception => e
             @logger.info "Error receiving messages from queue #{@queue_name}: #{e.message}"
             next
