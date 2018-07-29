@@ -32,6 +32,10 @@ module Sqspoller
                             end
     end
 
+    def all_threads_alive?
+      threads.all?(&:alive?)
+    end
+
     def start
       queue_url = @queue_details.queue_url
       @logger.info "Going to start polling threads for queue: #{queue_url}"
@@ -45,10 +49,10 @@ module Sqspoller
         poller = Aws::SQS::QueuePoller.new(queue_url)
         poller.before_request do |stats|
           block_on_maintenance_window
+          @logger.info "  Polling queue #{queue_name} for messages"
         end
 
         loop do
-          @logger.info "  Polling queue #{queue_name} for messages"
           poller.poll do |received_message|
             begin
               @task_delegator.process self, received_message, queue_name
@@ -58,6 +62,25 @@ module Sqspoller
             end
           end
         end
+        # loop do
+        #   block_on_maintenance_window
+        #   @logger.info "  Polling queue #{queue_name} for messages"
+        #   begin
+        #     msgs = @sqs.receive_message queue_url: queue_url, wait_time_seconds: 20
+        #   rescue Exception => e
+        #     @logger.info "Error receiving messages from queue #{@queue_name}: #{e.message}"
+        #     next
+        #   end
+        #   msgs.messages.each do |received_message|
+        #     begin
+        #       @logger.info "Received message from #{@queue_name} : #{received_message.message_id}"
+        #       @task_delegator.process self, received_message, @queue_name
+        #     rescue Exception => e
+        #       @logger.info "Encountered error #{e.message} while submitting message from queue #{queue_url}"
+        #     end
+        #   end
+        # end
+        @logger.info "Exiting thread, should never get here"
       end
     end
 
